@@ -3,6 +3,7 @@ import sys
 
 timeout = 2000
 history = 100
+port = None
 
 argv = list(reversed(sys.argv))
 
@@ -15,6 +16,9 @@ while len(argv) > 0:
     elif arg in ('--history'):
         arg = argv.pop()
         history = int(arg)
-        histtory = 500 if (history>500) else history
+        history = 500 if (history>500) else history
+    elif arg in ('--port'):
+        arg = argv.pop()
+        port = int(arg)
 
-run_pypeak(timeout, history)
+run_pypeak(timeout, history, port)
