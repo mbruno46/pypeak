@@ -13,4 +13,9 @@ setup(
     name='pypeak',
     version=version(),
     packages=find_packages(include=['pypeak*']),
+    install_requires = [
+        'dash', 
+        'dash_bootstrap_components',
+        'numpy'
+    ]
 )
