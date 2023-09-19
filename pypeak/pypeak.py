@@ -83,6 +83,7 @@ class Monitor:
         _values += [100.0 - sum(_values)]
         fig1.add_trace(go.Pie(labels=_labels, values=_values))
 
+        fig1.update_layout(margin=dict(t=0, b=0, l=0, r=0))
         return fig1, fig2
 
     def graphs(self, tag, f1, f2):
