@@ -1,18 +1,18 @@
-from .pypeak import run_pypeak
+from .pypeak import pypeak, Log
 import sys
 
-timeout = 2000
+interval = 2000
 history = 100
-port = None
+port = 5656
 
 argv = list(reversed(sys.argv))
 
 while len(argv) > 0:
     arg = argv.pop()
-    if arg in ('--timeout'):
+    if arg in ('--interval'):
         arg = argv.pop()
-        timeout = int(arg)
-        timeout = 500 if (timeout<500) else timeout
+        interval = int(arg)
+        interval = 500 if (interval<500) else interval
     elif arg in ('--history'):
         arg = argv.pop()
         history = int(arg)
@@ -21,4 +21,5 @@ while len(argv) > 0:
         arg = argv.pop()
         port = int(arg)
 
-run_pypeak(timeout, history, port)
+app = pypeak(Log(history, interval))
+app.run_server(debug=True, port=port)

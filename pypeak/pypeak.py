@@ -35,11 +35,12 @@ class User:
         self.cpu.init_record()
         self.ram.init_record()
         
-class Monitor:
-    def __init__(self, N, timeout):
+class Log:
+    def __init__(self, N, interval):
         self.N = N
         self.users = {}
-        self.xax = np.arange(N)*timeout/1e3
+        self.xax = np.arange(N)*interval/1e3
+        self.interval = interval
         
     def get_users(self):
         for u in psutil.users():
@@ -107,8 +108,8 @@ figure_template = go.Layout(
 
 ncpus = psutil.cpu_count()
 
-def cpu(monitor):
-    fig1, fig2 = monitor.plots('cpu', ncpus*100, ncpus)
+def cpu(log):
+    fig1, fig2 = log.plots('cpu', ncpus*100, ncpus)
     fig2.update_yaxes(range=[0, 100]) 
     fig3 = go.Figure(
         go.Bar(y=[p.user for p in psutil.cpu_times_percent(percpu=True)]),
@@ -120,8 +121,8 @@ def cpu(monitor):
     fig3.update_layout(figure_template)
     return fig1, fig2, fig3
 
-def cpu_div(monitor):
-    f1, f2, f3 = cpu(monitor)
+def cpu_div(log):
+    f1, f2, f3 = cpu(log)
     return dash.html.Div(children = [
         dash.html.H3("CPU"),
         dbc.Row([
@@ -136,15 +137,15 @@ def cpu_div(monitor):
 GB = 1024**3
 maxram = psutil.virtual_memory().total
 
-def ram(monitor):
-    fig1, fig2 = monitor.plots('ram', maxram, GB)
+def ram(log):
+    fig1, fig2 = log.plots('ram', maxram, GB)
     fig2.update_yaxes(range=[0, maxram/GB]) 
     fig1.update_layout(figure_template)
     fig2.update_layout(figure_template)
     return fig1, fig2
 
-def ram_div(monitor):
-    f1, f2 = ram(monitor)
+def ram_div(log):
+    f1, f2 = ram(log)
     return dash.html.Div(children = [
         dash.html.H3("Memory"),
         dbc.Row([
@@ -165,9 +166,7 @@ def disks():
 
 ######
 
-def run_pypeak(timeout, history, port):
-    
-    monitor = Monitor(history, timeout)
+def pypeak(log):
 
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
     app.title = "Avocado Analytics: Understand Your Avocados!"
@@ -182,8 +181,8 @@ def run_pypeak(timeout, history, port):
         dash.Input("interval","n_intervals")
     )
     def callback(n):
-        monitor()
-        return ("mykey",) + cpu(monitor) + ram(monitor)
+        log()
+        return ("mykey",) + cpu(log) + ram(log)
 
     app.layout = dash.html.Div(children = [
         dbc.Container([
@@ -194,16 +193,17 @@ def run_pypeak(timeout, history, port):
             dash.html.Hr(className="my-2")
         ], className="p-3 rounded-3"),
         dbc.Container(dbc.Col([
-            cpu_div(monitor),
+            cpu_div(log),
             dash.html.Hr(className="my-2"),
-            ram_div(monitor),
+            ram_div(log),
         ])),
         dcc.Interval(
             id="interval",
-            interval=timeout,
+            interval=log.interval,
             n_intervals=0
         )
     ])
 
+    return app
 # if __name__ == "__main__":
-    app.run_server(debug=True, port=port)
+    #app.run_server(debug=True, port=port)
