@@ -166,9 +166,11 @@ def disks():
 
 ######
 
-def pypeak(log):
+def pypeak(log, base_url=None):
 
-    app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+    app = dash.Dash(__name__, 
+        external_stylesheets=[dbc.themes.DARKLY],
+        routes_pathname_prefix=base_url)
     app.title = "Avocado Analytics: Understand Your Avocados!"
 
     @app.callback(
