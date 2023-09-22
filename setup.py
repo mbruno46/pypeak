@@ -16,7 +16,6 @@ setup(
     install_requires = [
         'dash', 
         'dash_bootstrap_components',
-        'gunicorn',
         'numpy'
     ]
 )
